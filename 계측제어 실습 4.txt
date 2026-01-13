@@ -1,0 +1,221 @@
+실습4
+4-1
+
+const int ledPin = 13;
+int ledState = LOW;
+unsigned long previousMillis = 0;
+const long interval = 2000;
+void setup() {
+pinMode(ledPin, OUTPUT);
+}
+void loop() {
+  unsigned long currentMillis = millis();
+if (currentMillis - previousMillis <= interval) {
+ledState = HIGH;
+digitalWrite(ledPin, ledState);
+}
+else if (currentMillis - previousMillis <= 3*interval){
+ledState = LOW;
+digitalWrite(ledPin, ledState);
+}
+else if (currentMillis - previousMillis > 3*interval){
+previousMillis = currentMillis;
+}
+}
+
+4-2
+
+const int switchPin = 9;
+unsigned long previousTime = 0;
+int switchState = 0;
+int prevSwitchState = 0;
+int led = 2;
+long interval = 3000;
+
+void setup () {
+for (int x= 2; x < 6; x++ ) {
+pinMode(x, OUTPUT);
+}
+pinMode(switchPin, INPUT);
+}
+
+void loop() {
+unsigned long currentTime = millis();
+if (currentTime - previousTime > interval) {
+previousTime = currentTime;
+digitalWrite(led, HIGH);
+led++;
+
+if (led == 6) {
+tone(8,330);
+digitalWrite(led, HIGH);
+}
+}
+
+switchState = digitalRead(switchPin);
+if (switchState != prevSwitchState) {
+for (int x = 2; x < 6; x++) {
+digitalWrite(x, LOW);
+noTone(8);
+} led =
+2;
+previousTime = currentTime;
+}
+prevSwitchState = switchState;
+}
+
+
+4-3
+const int switchPin = 2;
+const int motorPin = 9;
+int LastswitchState = 0;
+int switchPushCounter = 0;
+int switchState = 0;
+
+void setup () {
+pinMode(motorPin, OUTPUT);
+pinMode(switchPin, INPUT);
+}
+void loop() {
+ switchState = digitalRead(switchPin);
+
+
+if (switchState != LastswitchState && switchState == HIGH){
+   switchPushCounter++;
+}
+if (switchState == HIGH){
+  if (switchPushCounter%4 == 1){
+      analogWrite(motorPin,50);
+}
+ if (
+  switchPushCounter%4==2){
+    analogWrite(motorPin,100);
+} 
+if (
+  switchPushCounter%4 == 3){
+    analogWrite(motorPin,250);
+} 
+if (
+    switchPushCounter%4== 0){
+    analogWrite(motorPin,0);
+}
+}
+
+else {
+analogWrite(motorPin,0);
+}
+LastswitchState = switchState ;
+}
+
+4-4 융합문제1
+#include "pitches.h"
+int thisNote = 0;
+int piezoPin = 8;
+int sensorPin = A0;
+int sensorValue = 0;
+int melody[] = {
+NOTE_C4, NOTE_G3, NOTE_G3, NOTE_A3, NOTE_G3, 0, NOTE_B3,
+NOTE_C4 };
+int noteDurations[] = {
+4, 8, 8, 4, 4, 4, 4, 4 };
+
+void setup() {
+pinMode(piezoPin, OUTPUT);
+}
+
+void loop() {
+  sensorValue = analogRead(sensorPin);
+  sensorValue = map(sensorValue, 0, 1023, 0, 1000);
+
+  for (thisNote = 0; thisNote < 8; thisNote++) {
+int noteDuration = sensorValue / noteDurations[thisNote];
+tone(piezoPin , melody[thisNote], noteDuration);
+int pauseBetweenNotes = noteDuration * 1.30;
+delay(pauseBetweenNotes);
+noTone(8);
+  }
+}
+
+4-5 융합문제2
+#include "pitches.h" 
+const int ledpin = 13 ;
+const int PushButton = 2 ;
+const int Potentiometer = A5 ;
+int piezoPin = 8 ;
+int ButtonState ;
+int PotValue;
+int LastButtonState = LOW ;
+
+int melody[] = {
+NOTE_C4, NOTE_G3, NOTE_G3, NOTE_A3, NOTE_G3, 0, NOTE_B3,
+NOTE_C4 };
+
+int noteDurations[] = {
+4, 8, 8, 4, 4, 4, 4, 4 };
+
+void setup() {
+Serial.begin(9600);
+pinMode (PushButton, INPUT);
+pinMode (ledpin, OUTPUT );
+}
+
+void loop() {
+  PotValue = analogRead(Potentiometer);
+  PotValue = map(PotValue, 0, 1023, 10000, 0);
+  ButtonState = digitalRead(PushButton);
+  
+  if ( PotValue >= 5000 ) {
+      if ( ButtonState != LastButtonState && ButtonState == HIGH ) { 
+        LastButtonState = ButtonState;
+        for (int thisNote = 0; thisNote < 8; thisNote++) {
+        int noteDuration = 1000 / noteDurations[thisNote];
+        tone(piezoPin, melody[thisNote], noteDuration);
+        int pauseBetweenNotes = noteDuration * 1.30;
+        delay(pauseBetweenNotes);
+        noTone(8);
+        }
+delay(300);
+digitalWrite(ledpin,HIGH);
+    }
+  }
+  else if ( ButtonState != LastButtonState && ButtonState == LOW) {
+          LastButtonState = ButtonState;
+          digitalWrite(ledpin,HIGH);
+          }
+
+  else {
+        digitalWrite(ledpin,LOW);
+        }
+        Serial.println(PotValue);
+}
+
+
+4-6 융합문제3
+
+int sensorValue;
+int sensorLow = 1023;
+int sensorHigh = 0;
+void setup () {
+while (millis() < 5000) {
+
+sensorValue = analogRead(A0);
+if (sensorValue > sensorHigh) {
+sensorHigh = sensorValue;
+}
+if (sensorValue < sensorLow) {
+sensorLow = sensorValue;
+}
+}
+}
+
+void loop() {
+        sensorValue = analogRead(A0);
+        int MOT = map(sensorValue, sensorLow, sensorHigh, 0, 255);
+        analogWrite(9,MOT);
+        delay(10);
+}
+
+
+
+
+
